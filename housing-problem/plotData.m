@@ -1,4 +1,4 @@
-function plotData(x, y, xlabel1, ylabel2, title2)
+function plotData(x, y)
 %PLOTDATA Plots the data points x and y into a new figure 
 %   PLOTDATA(x,y) plots the data points and gives the figure axes labels of
 %   population and profit.
@@ -18,9 +18,10 @@ figure; % open a new figure window
 
 
 plot(x, y, 'rx', 'MarkerSize', 10); % Plot the data 
-ylabel(ylabel2); % Set the y−axis label 
-xlabel(xlabel1); % Set the x−axis label   
-title(title2)
+ylabel('Profit in $10,000s'); % Set the y−axis label 
+xlabel('Population of City in 10,000s'); % Set the x−axis label   
+
+
 
 % ============================================================
 
