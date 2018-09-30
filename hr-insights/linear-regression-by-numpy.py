@@ -6,23 +6,77 @@ Created on Sat Sep 22 12:39:41 2018
 @author: mukuljain
 """
 
+import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 
-X = np.array([[1], [2], [3]])
-y = np.array([[1], [2.5], [3.5]])
+fig = plt.figure(dpi=120)
+ax = plt.axes(projection='3d')
 
-get_theta = lambda theta: np.array([[0, theta]])
+theta0List = []
+theta1List = []
+gradientList = []
 
-thetas = list(map(get_theta, [0.5, 1.0, 1.5]))
-
-X = np.hstack([np.ones([3, 1]), X])
-
-def cost(X, y, theta):
-    inner = np.power(((X @ theta.T) - y), 2)
-    print ('Inner', inner)
-    cost = np.sum(inner) / (2 * len(X))
-    print ('cost', cost)
+def computeCost(m, theta, x, y):
+    hypothesis = theta[0] - np.dot(x, theta[1])
+    loss = hypothesis - y
+    # avg cost per example (the 2 in 2*m doesn't really matter here.
+    # But to be consistent with the gra
+    cost = np.sum(loss ** 2) / (2 * m)
     return cost
+    
+# m denotes the number of examples here, not the number of features
+def gradientDescent(x, y, theta, learning_rate, num_iterations):
+    m = len(X)
+    theta0Gradient = 0;
+    theta1Gradient = 0;
+    [theta0, theta1] = theta
+    for i in range(0, num_iterations):
+        cost = computeCost(m, theta, x, y)
+        theta0List.append(theta0)
+        theta1List.append(theta1)
+        gradientList.append(cost)
+        print("Iteration %d | Cost: %f | theta %f %f" % (i, cost,theta0, theta1))
+        theta0Gradient += -(2/m) * (y[i] - ((theta1 * x[i]) + theta0))
+        theta1Gradient += -(2/m) * x[i] * (y[i] - ((theta1 * x[i]) + theta1))
+        theta0 = theta0 - (learning_rate * theta0Gradient)
+        theta1 = theta1 - (learning_rate * theta1Gradient)
+        theta = [theta0, theta1]
+    return [theta0, theta1]
+    
+def readFile():
+    return pd.read_csv('./HR_comma_sep.csv')
 
-for i in range(len(thetas)):
-    print(cost(X, y, thetas[i]))
+def run():
+    # Read dataset
+    df = readFile();
+    [m, n] = df.shape
+
+    # Set hyper paramters
+    learning_rate = 0.01
+    # y = mx + b (slope formula) ~ theta1.x + theta0
+    num_iterations = 10000
+    
+    # Train our model
+    df = df[ df['Department'] == 'sales' ]
+    df = df.reindex(pd.RangeIndex(df.index.max() + 1)).ffill()
+    #  df = df.iloc[0:100,0:10]
+    [m, n] = df.shape
+    
+    X = df['satisfaction_level']
+    y = df['last_evaluation']
+    theta = [0, 0]
+    
+    print("Starting gradient descent at b = %d, m = %d, error = %f" % (theta[0], theta[1], computeCost(m, theta, X, y)))
+    print("Running...")
+    theta = gradientDescent(X, y, theta, learning_rate, num_iterations)
+    print("After %d iterations b = %f, m = %f, error = %f" % (num_iterations, theta[0], theta[1], computeCost(m, theta, X, y)))
+    zline = np.linspace(0, 15, 1000)
+    xline = np.sin(zline)
+    yline = np.cos(zline)
+    ax.plot_trisurf(theta1List, theta0List, gradientList, color='green')
+
+
+if __name__ == '__main__':
+    run()
