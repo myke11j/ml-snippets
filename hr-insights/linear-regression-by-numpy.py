@@ -18,6 +18,12 @@ theta0List = []
 theta1List = []
 gradientList = []
 
+class CostClass(object):
+    def __init__(self, cost, theta0, theta1):
+        self.cost = cost
+        self.theta0 = theta0
+        self.theta1 = theta1
+        
 def computeCost(m, theta, x, y):
     hypothesis = theta[0] - np.dot(x, theta[1])
     loss = hypothesis - y
@@ -26,9 +32,11 @@ def computeCost(m, theta, x, y):
     cost = np.sum(loss ** 2) / (2 * m)
     return cost
     
+costThetaList = []
+
 # m denotes the number of examples here, not the number of features
 def gradientDescent(x, y, theta, learning_rate, num_iterations):
-    m = len(X)
+    m = len(x)
     theta0Gradient = 0;
     theta1Gradient = 0;
     [theta0, theta1] = theta
@@ -36,8 +44,9 @@ def gradientDescent(x, y, theta, learning_rate, num_iterations):
         cost = computeCost(m, theta, x, y)
         theta0List.append(theta0)
         theta1List.append(theta1)
+        costThetaList.append(CostClass(cost, theta0, theta1))
         gradientList.append(cost)
-        print("Iteration %d | Cost: %f | theta %f %f" % (i, cost,theta0, theta1))
+#        print("Iteration %d | Cost: %f | theta %f %f" % (i, cost,theta0, theta1))
         theta0Gradient += -(2/m) * (y[i] - ((theta1 * x[i]) + theta0))
         theta1Gradient += -(2/m) * x[i] * (y[i] - ((theta1 * x[i]) + theta1))
         theta0 = theta0 - (learning_rate * theta0Gradient)
@@ -71,12 +80,10 @@ def run():
     print("Starting gradient descent at b = %d, m = %d, error = %f" % (theta[0], theta[1], computeCost(m, theta, X, y)))
     print("Running...")
     theta = gradientDescent(X, y, theta, learning_rate, num_iterations)
-    print("After %d iterations b = %f, m = %f, error = %f" % (num_iterations, theta[0], theta[1], computeCost(m, theta, X, y)))
-    zline = np.linspace(0, 15, 1000)
-    xline = np.sin(zline)
-    yline = np.cos(zline)
     ax.plot_trisurf(theta1List, theta0List, gradientList, color='green')
-
+    costThetaList.sort(key=lambda x: x.cost, reverse=False)
+    print("After %d iterations b = %f, m = %f, error = %f" % (num_iterations, costThetaList[0].theta0, costThetaList[0].theta1, costThetaList[0].cost))
+    
 
 if __name__ == '__main__':
     run()

@@ -20,7 +20,7 @@ def computeCost(m, theta0, theta1, x, y):
 
 # m denotes the number of examples here, not the number of features
 def gradientDescent(x, y, theta0, theta1, learning_rate, num_iterations):
-    m = len(X)
+    m = len(x)
     theta0Gradient = 0;
     theta1Gradient = 0;
     for i in range(0, num_iterations):
@@ -28,7 +28,7 @@ def gradientDescent(x, y, theta0, theta1, learning_rate, num_iterations):
         theta0List.append(theta0)
         theta1List.append(theta1)
         gradientList.append(cost)
-        # print("Iteration %d | Cost: %f" % (i, cost))
+        print("Iteration %d | Cost: %f" % (i, cost))
         theta0Gradient += -(2/m) * (y[i] - ((theta1 * x[i]) + theta0))
         theta1Gradient += -(2/m) * x[i] * (y[i] - ((theta1 * x[i]) + theta1))
         theta0 = theta0 - (learning_rate * theta0Gradient)
@@ -62,9 +62,6 @@ def run():
     print("Running...")
     [theta0, theta1] = gradientDescent(X, y, theta0, theta1, learning_rate, num_iterations)
     print("After %d iterations b = %f, m = %f, error = %f" % (num_iterations, theta0, theta1, computeCost(m, theta0, theta1, X, y)))
-    zline = np.linspace(0, 15, 1000)
-    xline = np.sin(zline)
-    yline = np.cos(zline)
     ax.plot_trisurf(theta1List, theta0List, gradientList, color='green')
 
 
